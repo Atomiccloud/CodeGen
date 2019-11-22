@@ -1,0 +1,11 @@
+K: void
+ID: main
+(
+K: void
+)
+{
+K: int
+ID: x
+;
+}
+$
