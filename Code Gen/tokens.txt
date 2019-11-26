@@ -1,3 +1,31 @@
+K: int
+ID: foo
+(
+K: int
+ID: x
+,
+K: int
+ID: y
+[
+]
+)
+{
+K: int
+ID: p
+[
+INT: 8
+]
+;
+ID: p
+[
+INT: 6
+]
+;
+ID: foo
+(
+)
+;
+}
 K: void
 ID: main
 (
@@ -6,6 +34,26 @@ K: void
 {
 K: int
 ID: x
+[
+INT: 4
+]
+;
+K: int
+ID: hello
+;
+K: int
+ID: the
+[
+INT: 76
+]
+;
+INT: 3
++
+INT: 3
+*
+INT: 2
++
+INT: 1
 ;
 }
 $

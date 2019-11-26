@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CodeGen {
@@ -7,6 +8,10 @@ public class CodeGen {
 	static Scanner sc = null;
 	static String curr_token = null;
 	static String tempToken = null;
+	static Line line;
+	static int lineCounter = 0;
+	static int paramCounter;
+	static ArrayList<Line> list = new ArrayList<Line>();
 	
  
 		
@@ -15,6 +20,8 @@ public class CodeGen {
 		Lexer lexer = new Lexer(textFile);
 		textFile = new File("tokens.txt");
 		
+		
+		
 		try {
 			sc = new Scanner(textFile);
 			curr_token = sc.nextLine();
@@ -22,7 +29,11 @@ public class CodeGen {
 			
 			decList();		
 			if(curr_token.equals("$")) {
-				System.out.println("ACCEPT");
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s\n", "index", "op", "opnd1", "opnd2", "result");
+				System.out.println("-------------------------------------------------------------------------");
+				for(int i=0;i<list.size();i++) {
+					list.get(i).print();
+				}
 			} else {
 				rej();
 			}
@@ -47,10 +58,12 @@ public class CodeGen {
 	}
 
 	private static void declaration() {
-		
+		String id;
+		String returnType = curr_token.substring(3);
 		typeSpecifier();
+		id = curr_token.substring(4);
 		checkID();
-		declarationP();
+		declarationP(id,returnType);
 	}
 
 	private static void checkID() {
@@ -61,20 +74,26 @@ public class CodeGen {
 		}		
 	}
 
-	private static void declarationP() {
+	private static void declarationP(String id,String returnType) {
 		if (curr_token.equals(";") || curr_token.equals("[")) {
 			varDecP();
 		} else if (curr_token.equals("(")) {
-			funDecP();
+			funDecP(id,returnType);
 		} else {
 			rej();
 		}
 	}
 	
-	private static void funDecP() {
+	private static void funDecP(String id, String returnType) {
+		line = new Line(lineCounter,"func",id,returnType,"");
+		int temp = lineCounter;
+		lineCounter++;
 		if (curr_token.equals("(")) {
 			curr_token = sc.nextLine();
+			paramCounter = 0;
+			list.add(line);
 			params();
+			list.get(temp).setResult(Integer.toString(paramCounter));
 			if (curr_token.equals(")")) {
 				curr_token = sc.nextLine();
 				compoundStmt();
@@ -84,6 +103,7 @@ public class CodeGen {
 		} else {
 			rej();
 		}
+		
 	}
 
 	private static void compoundStmt() {
@@ -147,7 +167,14 @@ public class CodeGen {
 	}
 
 	private static void addExpression() {
-		term();
+		String term = term();
+
+		if(term != null && term.contains("C: ")) {
+			Line lineAdd = new Line(lineCounter++,"call","","","");
+			lineAdd.setResult(term);
+		//	list.add(lineAdd);
+		}
+		
 		addExpressionP();
 	}
 
@@ -175,7 +202,8 @@ public class CodeGen {
 		curr_token = sc.nextLine();
 	}
 
-	private static void factor() {
+	private static String factor() {
+		String ret = null;
 		if (curr_token.equals("(")) {
 			curr_token = sc.nextLine();
 			expression();
@@ -183,21 +211,29 @@ public class CodeGen {
 				curr_token = sc.nextLine();
 			}
 		} else if (curr_token.contains("ID: ")) {
+			String temp = curr_token.substring(4);
 			checkID();
-			factorP();
+			ret = factorP();
+			if(ret != null && ret.equals("call")) {
+				ret = "C: " + temp;
+			}
 		} else if (curr_token.contains("INT: ") ) {
 			checkNUM();
 		} else {
 			rej();
 		}
+		return ret;
 	}
 
-	private static void factorP() {
+	private static String factorP() {
+		String ret = null;
 		if (curr_token.equals("(")) {
+			ret = "call";
 			callP();
 		} else {
 			varP();
 		}
+		return ret;
 	}
 
 	private static void varP() {
@@ -263,9 +299,11 @@ public class CodeGen {
 		}	
 	}
 
-	private static void term() {
-		factor();
+	private static String term() {
+		String ret = null;
+		ret = factor();
 		termP();
+		return ret;
 	}
 
 	private static void returnStmt() {
@@ -326,12 +364,21 @@ public class CodeGen {
 	}
 
 	private static void varDec() {
+		line = new Line(lineCounter, "alloc", "", "", "");
 		typeSpecifier();
+		if(curr_token.contains("ID: ")) {
+			line.setResult(curr_token.substring(4));
+		}
 		checkID();
 		if(curr_token.equals(";")) {
+			line.setOpnd1("4");
 			curr_token = sc.nextLine();
 		} else if (curr_token.equals("[")) {
 			curr_token = sc.nextLine();
+			if(curr_token.contains("INT: ")) {
+				int x = 4*(Integer.valueOf(curr_token.substring(5)));
+				line.setOpnd1(Integer.toString(x));
+			}
 			checkNUM();
 			if(!curr_token.equals("]")) {
 				rej();
@@ -344,7 +391,7 @@ public class CodeGen {
 		} else {
 			rej();
 		}
-		
+		list.add(line);
 	}
 
 	private static void checkNUM() {
@@ -377,14 +424,24 @@ public class CodeGen {
 	}
 
 	private static void param() {
+		line = new Line(lineCounter++,"param","","","");
+		paramCounter++;
 		typeSpecifier();
+		if(curr_token.contains("ID: ")) {
+			line.setResult(curr_token.substring(4));
+		}
+		list.add(line);
+		line = new Line(lineCounter++, "alloc" ,"4" ,"" ,curr_token.substring(4));
 		checkID();
 		if(curr_token.equals("[")) {
 			curr_token = sc.nextLine();
 			if(curr_token.equals("]")) {
 				curr_token = sc.nextLine();
 			}
+		} else {
+			
 		}
+		list.add(line);
 	}
 
 	private static void varDecP() {

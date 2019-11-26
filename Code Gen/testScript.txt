@@ -1,3 +1,13 @@
+int foo(int x, int y[]){
+	int p[8];
+	p[6];
+	foo();
+}
+
 void main(void){
-	int x;
+	int x[4];
+	int hello;
+	int the[76];
+	
+	3+3*2+1;
 }
