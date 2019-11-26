@@ -21,8 +21,11 @@ ID: p
 INT: 6
 ]
 ;
-ID: foo
+ID: bar
 (
+ID: x
+,
+INT: 8
 )
 ;
 }

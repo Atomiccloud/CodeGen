@@ -9,9 +9,11 @@ public class CodeGen {
 	static String curr_token = null;
 	static String tempToken = null;
 	static Line line;
+	static int cnt = 0;
 	static int lineCounter = 0;
-	static int paramCounter;
+	static int paramCounter, argCounter;
 	static ArrayList<Line> list = new ArrayList<Line>();
+	static String[] temps = {"t0","t1","t2","t3","t4","t5","t6","t6","t7","t8","t9","t10","t11","t12","t13","t14","t15","t16"}; 
 	
  
 		
@@ -166,13 +168,12 @@ public class CodeGen {
 		curr_token = sc.nextLine();
 	}
 
+	
 	private static void addExpression() {
 		String term = term();
-
 		if(term != null && term.contains("C: ")) {
-			Line lineAdd = new Line(lineCounter++,"call","","","");
-			lineAdd.setResult(term);
-		//	list.add(lineAdd);
+			Line lineAdd = new Line(lineCounter++,"call",term.substring(3),Integer.toString(argCounter),temps[cnt++]);
+			list.add(lineAdd);
 		}
 		
 		addExpressionP();
@@ -228,6 +229,7 @@ public class CodeGen {
 	private static String factorP() {
 		String ret = null;
 		if (curr_token.equals("(")) {
+			argCounter = 0;
 			ret = "call";
 			callP();
 		} else {
@@ -287,12 +289,15 @@ public class CodeGen {
 	}
 
 	private static void argList() {
+		argCounter++;
 		expression();
 		argListP();
 	}
 
 	private static void argListP() {
 		if(curr_token.equals(",")) {
+			argCounter++;
+			System.out.println(paramCounter);
 			curr_token = sc.nextLine();
 			expression();	
 			argListP();
@@ -364,7 +369,7 @@ public class CodeGen {
 	}
 
 	private static void varDec() {
-		line = new Line(lineCounter, "alloc", "", "", "");
+		line = new Line(lineCounter++, "alloc", "", "", "");
 		typeSpecifier();
 		if(curr_token.contains("ID: ")) {
 			line.setResult(curr_token.substring(4));
