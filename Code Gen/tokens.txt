@@ -50,13 +50,19 @@ ID: the
 INT: 76
 ]
 ;
-INT: 3
-+
-INT: 3
+INT: 1
 *
 INT: 2
-+
-INT: 1
+/
+INT: 3
+-
+INT: 7
+*
+INT: 4
+;
+ID: foobar
+(
+)
 ;
 }
 $

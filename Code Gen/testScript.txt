@@ -9,5 +9,11 @@ void main(void){
 	int hello;
 	int the[76];
 	
-	3+3*2+1;
+	1*2/3-7*4;
+	
+	foobar();
 }
+
+// mult 4  2  t1
+// Add  3  t1 t2
+// add  t2 1  t3

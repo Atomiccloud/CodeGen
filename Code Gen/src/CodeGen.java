@@ -170,29 +170,69 @@ public class CodeGen {
 
 	
 	private static void addExpression() {
+		Line lineAdd;
+		String s = curr_token;
 		String term = term();
 		if(term != null && term.contains("C: ")) {
-			Line lineAdd = new Line(lineCounter++,"call",term.substring(3),Integer.toString(argCounter),temps[cnt++]);
+			lineAdd = new Line(lineCounter++,"call",term.substring(3),Integer.toString(argCounter),temps[cnt++]);
 			list.add(lineAdd);
-		}
-		
-		addExpressionP();
+		} 
+		addExpressionP(s);
 	}
 
-	private static void addExpressionP() {
+	private static Line addExpressionP(String s) {
+		Line line = null;
+		String temp;
+		String addop;
 		if (curr_token.equals("+") || curr_token.equals("-")) {
+			if(curr_token.equals("+")) {
+				addop = "add";				
+			} else {
+				addop = "sub";
+			}
 			addop();
-			term();
-			addExpressionP();
+			temp = term();
+			if(temp.startsWith("t")) {
+				if(s.startsWith("INT: ")) {
+					line = new Line(lineCounter++,addop,s.substring(5),temp,temps[cnt++]);					
+				} else {
+					line = new Line(lineCounter++,addop,s,temp,temps[cnt++]);
+				}
+				list.add(line);
+			} else if(temp.startsWith("INT: ")) {
+				line = new Line(lineCounter++,addop,s,temp.substring(5),temps[cnt++]);
+				list.add(line);
+			}
+			s = temps[cnt-1];
+			addExpressionP(s);
 		}
+		return line;
 	}
 
-	private static void termP() {
+	private static Line termP(boolean b) {
+		Line multLine = null;
+		Line termp = null;
+		String s;
 		if (curr_token.equals("*") || curr_token.equals("/")) {
+			multLine = new Line(lineCounter++,"","","","");
+			if(curr_token.equals("*")) {
+				multLine.setOp("mult");
+			} else {
+				multLine.setOp("div");
+			}
 			mulop();
-			factor();
-			termP();
+			s = factor();
+			if(s.contains("INT: ")) {
+				multLine.setOpnd2(s.substring(5));
+			}
+			termp = termP(true);
+			if(termp != null) {
+				termp.setOpnd1(s.substring(5));	
+				termp.setResult(temps[cnt++]);
+				list.add(termp);					
+			}
 		}
+		return multLine;
 	}
 
 	private static void mulop() {
@@ -219,6 +259,7 @@ public class CodeGen {
 				ret = "C: " + temp;
 			}
 		} else if (curr_token.contains("INT: ") ) {
+			ret = curr_token;
 			checkNUM();
 		} else {
 			rej();
@@ -297,7 +338,6 @@ public class CodeGen {
 	private static void argListP() {
 		if(curr_token.equals(",")) {
 			argCounter++;
-			System.out.println(paramCounter);
 			curr_token = sc.nextLine();
 			expression();	
 			argListP();
@@ -306,8 +346,17 @@ public class CodeGen {
 
 	private static String term() {
 		String ret = null;
+		Line mulop;
 		ret = factor();
-		termP();
+		mulop = termP(false);
+		if(mulop!=null) {
+			mulop.setOpnd1(ret.substring(5));
+			ret = temps[cnt++];
+			mulop.setResult(ret);
+			list.add(mulop);
+		} else {
+			//mulop = new Line(lineCounter++,"","","","");
+		}
 		return ret;
 	}
 
