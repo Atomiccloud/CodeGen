@@ -1,19 +1,6 @@
-int foo(int x, int y[]){
-	int p[8];
-	p[6];
-	bar(x,8);
-}
-
 void main(void){
-	int x[4];
-	int hello;
-	int the[76];
+	foo(x,y);
+	3+4*2+1;
 	
-	1*2/3-7*4;
-	
-	foobar();
+	5*6/7*8;
 }
-
-// mult 4  2  t1
-// Add  3  t1 t2
-// add  t2 1  t3

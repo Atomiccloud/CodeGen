@@ -209,7 +209,7 @@ public class CodeGen {
 		return line;
 	}
 
-	private static Line termP(boolean b) {
+	private static Line termP() {
 		Line multLine = null;
 		Line termp = null;
 		String s;
@@ -225,7 +225,7 @@ public class CodeGen {
 			if(s.contains("INT: ")) {
 				multLine.setOpnd2(s.substring(5));
 			}
-			termp = termP(true);
+			termp = termP();
 			if(termp != null) {
 				termp.setOpnd1(s.substring(5));	
 				termp.setResult(temps[cnt++]);
@@ -348,7 +348,7 @@ public class CodeGen {
 		String ret = null;
 		Line mulop;
 		ret = factor();
-		mulop = termP(false);
+		mulop = termP();
 		if(mulop!=null) {
 			mulop.setOpnd1(ret.substring(5));
 			ret = temps[cnt++];

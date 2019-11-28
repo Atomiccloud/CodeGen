@@ -1,68 +1,31 @@
-K: int
-ID: foo
-(
-K: int
-ID: x
-,
-K: int
-ID: y
-[
-]
-)
-{
-K: int
-ID: p
-[
-INT: 8
-]
-;
-ID: p
-[
-INT: 6
-]
-;
-ID: bar
-(
-ID: x
-,
-INT: 8
-)
-;
-}
 K: void
 ID: main
 (
 K: void
 )
 {
-K: int
+ID: foo
+(
 ID: x
-[
+,
+ID: y
+)
+;
+INT: 3
++
 INT: 4
-]
-;
-K: int
-ID: hello
-;
-K: int
-ID: the
-[
-INT: 76
-]
-;
-INT: 1
 *
 INT: 2
++
+INT: 1
+;
+INT: 5
+*
+INT: 6
 /
-INT: 3
--
 INT: 7
 *
-INT: 4
-;
-ID: foobar
-(
-)
+INT: 8
 ;
 }
 $
